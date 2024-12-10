@@ -1,6 +1,8 @@
 <?php
 include '..\config\db.php';
 
+include 'search_book.php';
+
 // Function to search for available books
 function searchAvailableBooks($searchTerm, $category = null) {
     global $pdo;

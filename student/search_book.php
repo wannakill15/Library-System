@@ -1,11 +1,14 @@
 <?php
 session_start();
 
-// Ensure user is logged in (add your authentication check)
-// if (!isset($_SESSION['user_id'])) {
-//     header('Location: login.php');
-//     exit();
-// }
+// Check if user is logged in
+if (!isset($_SESSION['UserId'])) {
+    echo "You are not logged in. Please log in first.";
+    header('Location: ..\login.php');
+
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

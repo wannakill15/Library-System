@@ -1,5 +1,13 @@
 <?php
- include 'user_management.php'
+ include 'user_management.php';
+
+ session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['UserId'])) {
+    echo "You are not logged in. Please log in first.";
+    header('Location: ..\login.php');
+}
 ?>
 
 <!DOCTYPE html>

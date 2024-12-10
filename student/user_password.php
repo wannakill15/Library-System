@@ -2,10 +2,10 @@
 session_start();
 require_once '..\config\db.php';
 
-
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    die("You must be logged in to access this page.");
+    header('Location: ..\login.php');
+    exit();
 }
 
 // Get the current user's ID
@@ -61,57 +61,77 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit Password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Password</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
+            background-color: #f4f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
         }
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
-        .success {
-            color: green;
-            margin-bottom: 10px;
-        }
-        input {
+        .password-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
             width: 100%;
-            padding: 8px;
-            margin: 10px 0;
+            max-width: 400px;
         }
-        label {
-            display: block;
-            margin-top: 10px;
+        .btn-primary {
+            width: 100%;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <h2>Change Password</h2>
-    
-    <?php if ($error): ?>
-        <div class="error"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
-    
-    <?php if ($success): ?>
-        <div class="success"><?php echo htmlspecialchars($success); ?></div>
-    <?php endif; ?>
-    
-    <form method="POST" action="">
-        <label for="current_password">Current Password:</label>
-        <input type="password" id="current_password" name="current_password" required>
-        
-        <label for="new_password">New Password:</label>
-        <input type="password" id="new_password" name="new_password" required>
-        
-        <label for="confirm_password">Confirm New Password:</label>
-        <input type="password" id="confirm_password" name="confirm_password" required>
-        
-        <input type="submit" value="Update Password">
-    </form>
-    
-    <p><a href="dashboard.php">Back to Dashboard</a></p>
+    <div class="container">
+        <div class="password-container">
+            <h2 class="text-center mb-4">Change Password</h2>
+            
+            <?php if ($error): ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($success): ?>
+                <div class="alert alert-success" role="alert">
+                    <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+            
+            <form method="POST" action="">
+                <div class="mb-3">
+                    <label for="current_password" class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" required>
+                    <small class="form-text text-muted">Minimum 8 characters</small>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+            
+            <div class="text-center mt-3">
+                <a href="dashboard.php" class="text-muted">Back to Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
