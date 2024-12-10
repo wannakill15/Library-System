@@ -2,10 +2,9 @@
 session_start();
 
 // Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['UserId'])) {
     die("You must be logged in to access this page.");
 }
-
 ?>
 
 <!DOCTYPE html>

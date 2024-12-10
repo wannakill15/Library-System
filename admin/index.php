@@ -1,12 +1,13 @@
 <?php
 require_once '..\config\db.php';
 
-// session_start();
+session_start();
 
-// // Check if user is logged in
-// if (!isset($_SESSION['user_id'])) {
-//     die("You must be logged in to access this page.");
-// }
+// Check if user is logged in
+if (!isset($_SESSION['UserId'])) {
+    echo "You are not logged in. Please log in first.";
+    header('Location: ..\login.php');
+}
 
 
 try {
@@ -79,6 +80,11 @@ try {
                 <li class="mb-2">
                     <a href="user.php" class="hover:bg-blue-700 p-2 block rounded">
                         User Management
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="..\logout.php" class="hover:bg-blue-700 p-2 block rounded">
+                        Logout
                     </a>
                 </li>
             </ul>

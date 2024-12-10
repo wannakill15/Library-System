@@ -3,12 +3,11 @@ session_start();
 include 'config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_POST['user_id'];
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND email = ?");
-    $stmt->execute([$user_id, $email]);
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($user && password_verify($password, $user['password'])) {
@@ -17,21 +16,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         switch ($user['user_type']) {
             case 'student':
-                header('Location: student\index.php');
+                header('Location: student/index.php');
                 break;
             case 'staff':
-                header('Location: staff\index.php');
+                header('Location: staff/index.php');
                 break;
             case 'admin':
-                header('Location: admin\index.php');
+                header('Location: admin/index.php');
                 break;
             default:
-                echo "Invalid user type.";
+                $_SESSION['error'] = "Invalid user type.";
+                header('Location: login.php');
                 break;
         }
         exit();
     } else {
-        echo "Invalid email or password.";
+        $_SESSION['error'] = "Invalid email or password.";
+        header('Location: login.php');
+        exit();
     }
 }
 ?>

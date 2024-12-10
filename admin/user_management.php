@@ -24,7 +24,8 @@ function deleteUser ($id) {
 }
 
 // Function to get user details
-function getUserDetails($id) {    global $pdo;
+function getUserDetails($id) {    
+    global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->execute([$id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -42,10 +43,16 @@ function getBorrowingHistory($user_id) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['add'])) {
         addUser ($_POST['name'], $_POST['email'], $_POST['password'], $_POST['user_type']);
+        header("Location: user.php"); // Redirect back to user.php after adding user
+        exit(); // Stop further script execution
     } elseif (isset($_POST['edit'])) {
         editUser ($_POST['id'], $_POST['name'], $_POST['email'], $_POST['user_type']);
+        header("Location: user.php"); // Redirect back to user.php after editing user
+        exit(); // Stop further script execution
     } elseif (isset($_POST['delete'])) {
         deleteUser ($_POST['id']);
+        header("Location: user.php"); // Redirect back to user.php after deleting user
+        exit(); // Stop further script execution
     }
 }
 

@@ -10,7 +10,7 @@
     <h1>Login</h1>
 
     <form method="POST" action="auth.php">
-        <input type="hidden" id="user_id">
+        <input type="hidden" name="user_id" id="user_id">
         <label for="email">Email</label>
         <input type="email" name="email" id="email" required>
         <br>
