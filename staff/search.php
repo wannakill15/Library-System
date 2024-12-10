@@ -7,6 +7,7 @@ session_start();
 if (!isset($_SESSION['UserId'])) {
     echo "You are not logged in. Please log in first.";
     header('Location: ..\login.php');
+}
 
 ?>
 
@@ -19,7 +20,6 @@ if (!isset($_SESSION['UserId'])) {
 </head>
 <body>
     <?php
-    session_start();
 
     // Initialize variables
     $searchResults = [];

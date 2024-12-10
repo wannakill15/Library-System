@@ -7,6 +7,7 @@ session_start();
 if (!isset($_SESSION['UserId'])) {
     echo "You are not logged in. Please log in first.";
     header('Location: ..\login.php');
+}
 
 // Retrieve results from GET parameters
 $userId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
