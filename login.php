@@ -9,6 +9,14 @@
 <body>
     <h1>Login</h1>
 
+    <?php 
+    session_start();
+    if (isset($_SESSION['error'])) {
+        echo "<p style='color: red;'>" . htmlspecialchars($_SESSION['error']) . "</p>";
+        unset($_SESSION['error']); // Clear the error after displaying
+    }
+    ?>
+
     <form method="POST" action="auth.php">
         <input type="hidden" name="user_id" id="user_id">
         <label for="email">Email</label>
@@ -21,9 +29,5 @@
 
         <button type="submit">Login</button>
     </form>
-
-    <?php if (isset($error)): ?>
-        <p style="color: red;"><?php echo $error; ?></p>
-    <?php endif; ?>
 </body>
 </html>

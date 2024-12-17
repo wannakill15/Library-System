@@ -67,9 +67,17 @@ if (!isset($_SESSION['UserId'])) {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-gray-700 mb-2">User ID</label>
-                                <input type="text" name="user_id" placeholder="Enter User ID" required 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <label class="block text-gray-700 mb-2">Select User</label>
+                                <select name="user_id" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="">Select User</option>
+                                    <?php
+                                    // Fetch all users except admins
+                                    $users = $pdo->query("SELECT id, name FROM users WHERE user_type != 'admin'")->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($users as $user) {
+                                        echo "<option value=\"{$user['id']}\">{$user['name']} (ID: {$user['id']})</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <button type="submit" name="borrow" 
                                 class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300 flex items-center justify-center">
@@ -77,27 +85,27 @@ if (!isset($_SESSION['UserId'])) {
                             </button>
                         </form>
                     </div>
-
                     <!-- Return Book Section -->
                     <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
                         <h2 class="text-xl font-semibold mb-4 text-green-700">
                             <i class="fas fa-undo mr-2"></i>Return Book
                         </h2>
                         <form method="POST" action="borrowing_management.php" class="space-y-4">
-                            <div>
-                                <label class="block text-gray-700 mb-2">Select Transaction</label>
-                                <select name="transaction_id" required 
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                                    <option value="">Select Transaction</option>
-                                    <?php
-                                    // Existing transaction population logic
-                                    $transactions = getAllBorrowingTransactions();
-                                    foreach ($transactions as $transaction) {
-                                        echo "<option value=\"{$transaction['TransactionID']}\">Transaction ID: {$transaction['TransactionID']} - {$transaction['Title']}</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2">Select Transaction</label>
+                            <select name="transaction_id" required 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="">Select Transaction</option>
+                                <?php
+                                // Existing transaction population logic
+                                $transactions = getAllBorrowingTransactions();
+                                foreach ($transactions as $transaction) {
+                                    // Update this line to include borrower name
+                                    echo "<option value=\"{$transaction['TransactionID']}\">Transaction ID: {$transaction['TransactionID']} - {$transaction['Title']} (Borrowed by: {$transaction['Borrower']})</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
                             <button type="submit" name="return" 
                                 class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition duration-300 flex items-center justify-center">
                                 <i class="fas fa-check-circle mr-2"></i>Return Book

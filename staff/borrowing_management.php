@@ -5,13 +5,44 @@ include '..\config\db.php';
 function borrowBook($bookId, $userId) {
     global $pdo;
 
-    // Set the borrowing and due dates
-    $borrowDate = date('Y-m-d');
-    $dueDate = date('Y-m-d', strtotime('+14 days')); // Assuming a 14-day borrowing period
+    try {
+        // First, verify that the user exists
+        $userStmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $userStmt->execute([$userId]);
+        $userExists = $userStmt->fetch(PDO::FETCH_ASSOC);
 
-    // Insert into BorrowingTransactions
-    $stmt = $pdo->prepare("INSERT INTO BorrowingTransactions (BookID, UserID, BorrowDate, DueDate) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$bookId, $userId, $borrowDate, $dueDate]);
+        if (!$userExists) {
+            throw new Exception("Invalid User ID. User not found.");
+        }
+
+        // Verify that the book exists and is available
+        $bookStmt = $pdo->prepare("SELECT BookID FROM books WHERE BookID = ?");
+        $bookStmt->execute([$bookId]);
+        $bookExists = $bookStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$bookExists) {
+            throw new Exception("Invalid Book ID. Book not found.");
+        }
+
+        // Set the borrowing and due dates
+        $borrowDate = date('Y-m-d');
+        $dueDate = date('Y-m-d', strtotime('+14 days')); // Assuming a 14-day borrowing period
+
+        // Insert into BorrowingTransactions
+        $stmt = $pdo->prepare("INSERT INTO BorrowingTransactions (BookID, UserID, BorrowDate, DueDate) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$bookId, $userId, $borrowDate, $dueDate]);
+
+        // Optionally, update user's borrowed books count
+        $updateStmt = $pdo->prepare("UPDATE users SET borrowed_books = borrowed_books + 1 WHERE id = ?");
+        $updateStmt->execute([$userId]);
+
+        return true;
+    } catch (Exception $e) {
+        // Log the error or display a user-friendly message
+        error_log($e->getMessage());
+        echo "Error: " . $e->getMessage();
+        return false;
+    }
 }
 
 // Function to return a book
@@ -58,6 +89,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (isset($_POST['return'])) {
         returnBook($_POST['transaction_id']);
     }
+    
+    header('Location: borrowing.php');
+    exit();
 }
 
 // Fetch all borrowing transactions for display

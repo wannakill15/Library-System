@@ -55,7 +55,7 @@ function getUserBorrowingTransactions($userId) {
 // Example usage
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['borrow'])) {
-        borrowBook($_POST['book_id'], $_POST['user_id']);
+        borrowBook($_POST['book_id'], $_POST['UserId']);
     } elseif (isset($_POST['return'])) {
         returnBook($_POST['transaction_id']);
     }
@@ -63,6 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Assuming user ID is retrieved from session
 session_start();
-$userId = $_SESSION['user_id'];
+$userId = $_SESSION['UserId'];
 $transactions = getUserBorrowingTransactions($userId);
 ?>

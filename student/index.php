@@ -1,46 +1,52 @@
 <?php
-
+// Start session at the beginning of the file
+session_start();
 
 // Include necessary files
-require_once '..\config\db.php';
-include 'search_book.php';
+require_once '../config/db.php';
 
 // Check if user is logged in
-// if (!isset($_SESSION['user_id'])) {
-//     header('Location: ../login.php');
-//     exit();
-// }
+if (!isset($_SESSION['UserId'])) {
+    $_SESSION['error'] = "You are not logged in. Please log in first.";
+    header('Location: ../login.php');
+    exit();
+}
 
-// Fetch user's borrowed books and fines
-$user_id = $_SESSION['user_id'];
+// Fetch user's borrowed books and fines using PDO
+try {
+    $user_id = $_SESSION['UserId'];
 
-// Get total number of borrowed books
-$borrowed_stmt = $conn->prepare("SELECT COUNT(*) as total_borrowed FROM BorrowingTransactions WHERE UserID = ? AND ReturnDate IS NULL");
-$borrowed_stmt->bind_param("i", $user_id);
-$borrowed_stmt->execute();
-$borrowed_result = $borrowed_stmt->get_result();
-$borrowed_count = $borrowed_result->fetch_assoc()['total_borrowed'];
+    // Get total number of borrowed books
+    $borrowed_stmt = $pdo->prepare("SELECT COUNT(*) as total_borrowed FROM BorrowingTransactions WHERE UserID = ? AND ReturnDate IS NULL");
+    $borrowed_stmt->execute([$user_id]);
+    $borrowed_count = $borrowed_stmt->fetchColumn();
 
-// Get total fines
-$fines_stmt = $conn->prepare("SELECT SUM(Fine) as total_fines FROM BorrowingTransactions WHERE UserID = ?");
-$fines_stmt->bind_param("i", $user_id);
-$fines_stmt->execute();
-$fines_result = $fines_stmt->get_result();
-$total_fines = $fines_result->fetch_assoc()['total_fines'] ?? 0;
+    // Get total fines
+    $fines_stmt = $pdo->prepare("SELECT SUM(Fine) as total_fines FROM BorrowingTransactions WHERE UserID = ?");
+    $fines_stmt->execute([$user_id]);
+    $total_fines = $fines_stmt->fetchColumn() ?? 0;
 
-// Fetch recent borrowed books
-$recent_books_stmt = $conn->prepare("
-    SELECT lr.Title, bt.BorrowDate, bt.DueDate 
-    FROM BorrowingTransactions bt
-    JOIN LibraryResources lr ON bt.BookID = lr.ResourceID
-    WHERE bt.UserID = ? 
-    ORDER BY bt.BorrowDate DESC 
-    LIMIT 5
-");
-$recent_books_stmt->bind_param("i", $user_id);
-$recent_books_stmt->execute();
-$recent_books = $recent_books_stmt->get_result();
+    // Fetch recent borrowed books
+    $recent_books_stmt = $pdo->prepare("
+        SELECT lr.Title, bt.BorrowDate, bt.DueDate 
+        FROM BorrowingTransactions bt
+        JOIN LibraryResources lr ON bt.BookID = lr.ResourceID
+        WHERE bt.UserID = ? 
+        ORDER BY bt.BorrowDate DESC 
+        LIMIT 5
+    ");
+    $recent_books_stmt->execute([$user_id]);
+    $recent_books = $recent_books_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    // Log the error and show a generic error message
+    error_log("Database error: " . $e->getMessage());
+    $_SESSION['error'] = "An error occurred while fetching your library information.";
+    header('Location: ../login.php');
+    exit();
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -162,13 +168,13 @@ $recent_books = $recent_books_stmt->get_result();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($book = $recent_books->fetch_assoc()): ?>
+                    <?php foreach ($recent_books as $book): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($book['Title']); ?></td>
                         <td><?php echo htmlspecialchars($book['BorrowDate']); ?></td>
                         <td><?php echo htmlspecialchars($book['DueDate']); ?></td>
                     </tr>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
